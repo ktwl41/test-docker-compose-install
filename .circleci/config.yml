@@ -1,17 +1,25 @@
 version: 2.1
 
 jobs:
-  echo:
-    docker:
-      - image: cimg/base:stable
+  check:
+    machine:
+      image: ubuntu-1604:202007-01
     steps:
       - run:
-          name: Greet
-          command: echo "I love ${COLOR} builds."
+          name: Install Docker Compose
           environment:
-            COLOR: "green"
+            COMPOSE_VERSION: '1.29.2'
+          command: |
+            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - run:
+          name: Check
+          command: |
+            command -v docker-compose
+            docker-compose --version
 
 workflows:
   main:
     jobs:
-      - echo
+      - check
